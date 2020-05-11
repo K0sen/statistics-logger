@@ -1,0 +1,32 @@
+version: "3.5"
+services:
+  node-producer:
+    build: './producer'
+    env_file: .env
+    environment:
+      - REDIS_PORT=redis://redis
+      - APPLICATION_AMOUNT=${APPLICATION_AMOUNT}
+    ports:
+      - "${PRODUCER_PORT}:3000"
+    volumes:
+      - ./producer/src:/app/src:rw
+      - ./shared:/app/shared:rw
+    depends_on: ["redis"]
+
+  node-consumer:
+    build: './consumer'
+    env_file: .env
+    environment:
+      - REDIS_PORT=redis://redis
+      - APPLICATION_AMOUNT=${APPLICATION_AMOUNT}
+    ports:
+      - "${CONSUMER_PORT}:3000"
+    volumes:
+      - ./consumer/src:/app/src:rw
+      - ./shared:/app/shared:rw
+    depends_on: ["redis"]
+
+  redis:
+    image: redis:6.0-rc4
+    ports:
+      - '6379:6379'
